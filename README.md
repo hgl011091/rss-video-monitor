@@ -33,7 +33,7 @@
 
 ## 📸 界面预览
 
-> 将截图放入仓库 `docs/` 目录后，替换下方图片路径即可展示。<img width="1614" height="900" alt="222" src="https://github.com/user-attachments/assets/2ca9f30c-4c39-4e9d-9eb7-b8e401c15481" />
+<img width="1614" height="900" alt="222" src="https://github.com/user-attachments/assets/2ca9f30c-4c39-4e9d-9eb7-b8e401c15481" />
 <img width="1614" height="900" alt="111" src="https://github.com/user-attachments/assets/1c6044da-45ce-4953-84af-c43ab1b5f6d7" />
 <img width="1614" height="1086" alt="444" src="https://github.com/user-attachments/assets/e16af1ef-9632-4543-a6fa-56243508835d" />
 <img width="1614" height="1005" alt="333" src="https://github.com/user-attachments/assets/28b5cc1a-9b6e-4f44-82ad-e494adec4bc9" />
