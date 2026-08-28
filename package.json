@@ -1,0 +1,90 @@
+{
+  "name": "rss-video-monitor",
+  "version": "1.0.0",
+  "description": "RSS视频监控程序 - 每5分钟检查RSS源，新视频邮件通知，美观GUI界面",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "pack": "electron-builder --dir",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "keywords": [
+    "rss",
+    "video",
+    "monitor",
+    "electron",
+    "desktop"
+  ],
+  "author": "RSS Video Monitor",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^23.6.0",
+    "eslint": "^8.56.0"
+  },
+  "dependencies": {
+    "@electron/asar": "^4.3.0",
+    "axios": "^1.6.7",
+    "electron-store": "^8.1.0",
+    "node-schedule": "^2.1.1",
+    "nodemailer": "^6.9.10",
+    "rss-parser": "^3.13.0"
+  },
+  "build": {
+    "appId": "com.rssvideomonitor.app",
+    "productName": "RSS视频监控",
+    "copyright": "Copyright © 2024 RSS Video Monitor",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "main/**/*",
+      "renderer/**/*",
+      "preload/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources",
+        "filter": "**/*"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "resources/icon.ico",
+      "executableName": "rss-video-monitor"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RSS视频监控",
+      "uninstallDisplayName": "RSS视频监控",
+      "license": "resources/license.txt"
+    },
+    "portable": {
+      "artifactName": "RSS视频监控-${version}-portable.${ext}"
+    },
+    "publish": null,
+    "compression": "maximum",
+    "asar": true
+  },
+  "allowScripts": {
+    "electron@28.3.3": true
+  }
+}

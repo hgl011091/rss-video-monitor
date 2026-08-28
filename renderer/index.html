@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width: device-width, initial-scale= 1.0">
+  <title>RSS视频监控</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- 自定义标题栏 -->
+    <header class="titlebar" id="titlebar">
+      <div class="titlebar-left">
+        <div class="app-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <path d="M10 15h4"></path>
+            <path d="M12 13v4"></path>
+          </svg>
+        </div>
+        <h1 class="app-title">RSS视频监控</h1>
+      </div>
+      
+      <div class="titlebar-center">
+        <div class="status-indicator" id="statusIndicator">
+          <span class="status-dot" id="statusDot"></span>
+          <span class="status-text" id="statusText">监控已停止</span>
+        </div>
+      </div>
+      
+      <div class="titlebar-right">
+        <button class="icon-btn" id="minimizeBtn" title="最小化" aria-label="最小化">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button class="icon-btn" id="maximizeBtn" title="最大化" aria-label="最大化">
+          <svg class="icon-maximize" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          </svg>
+          <svg class="icon-restore" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <rect x="7" y="7" width="10" height="10" rx="1" ry="1"></rect>
+          </svg>
+        </button>
+        <button class="icon-btn" id="monitorToggleBtn" title="开始监控" aria-label="开始监控">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </button>
+        <button class="icon-btn close-btn" id="closeBtn" title="关闭到托盘" aria-label="关闭到托盘">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <div class="sidebar" id="sidebar">
+        <nav class="nav">
+          <button class="nav-item active" data-tab="dashboard" id="navDashboard">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+            <span>仪表盘</span>
+          </button>
+          <button class="nav-item" data-tab="feeds" id="navFeeds">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 11a9 9 0 0 1 9 9"></path>
+              <path d="M4 4a16 16 0 0 1 16 16"></path>
+              <circle cx="5" cy="19" r="1"></circle>
+            </svg>
+            <span>RSS源管理</span>
+            <span class="nav-badge" id="feedsBadge" style="display: none;">0</span>
+          </button>
+          <button class="nav-item" data-tab="history" id="navHistory">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>检查历史</span>
+          </button>
+          <button class="nav-item" data-tab="settings" id="navSettings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>设置</span>
+          </button>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <div class="version-info">
+            <span>版本 1.0.0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content" id="content">
+        <!-- 仪表盘 -->
+        <section class="tab-panel active" id="tabDashboard">
+          <div class="panel-header">
+            <h2>仪表盘</h2>
+            <div class="panel-actions">
+              <button class="btn btn-primary" id="manualCheckBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                立即检查
+              </button>
+            </div>
+          </div>
+          
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 11a9 9 0 0 1 9 9"></path>
+                  <path d="M4 4a16 16 0 0 1 16 16"></path>
+                  <circle cx="5" cy="19" r="1"></circle>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statFeeds">0</div>
+                <div class="stat-label">RSS源数量</div>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statEnabledFeeds">0</div>
+                <div class="stat-label">启用的源</div>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value" id="statNotified">0</div>
+                <div class="stat-label">已通知视频</div>
+              </div>
+            </div>
+            
+            
+          </div>
+          
+          <div class="dashboard-grid">
+            <div class="card">
+              <div class="card-header">
+                <h3>最近发现的视频</h3>
+                <button class="btn btn-ghost btn-sm" id="viewAllHistoryBtn">查看全部</button>
+              </div>
+              <div class="card-content" id="recentVideos">
+                <div class="empty-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                  <p>暂无发现的视频</p>
+                  <span>配置 RSS 源并开始监控后将显示在这里</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card">
+              <div class="card-header">
+                <h3>监控状态</h3>
+              </div>
+              <div class="card-content">
+                <div class="monitor-status" id="monitorStatus">
+                  <div class="status-item">
+                    <span class="status-label">监控状态</span>
+                    <span class="status-value" id="monitorState">已停止</span>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">检查间隔</span>
+                    <span class="status-value" id="checkInterval">5 分钟</span>
+                  </div>
+                  
+                  <div class="status-item">
+                    <span class="status-label">下次检查</span>
+                    <span class="status-value" id="nextCheck">-</span>
+                  </div>
+                  <div class="status-item">
+                    <span class="status-label">邮件通知</span>
+                    <span class="status-value" id="emailStatus">未配置</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RSS源管理 -->
+        <section class="tab-panel" id="tabFeeds">
+          <div class="panel-header">
+            <h2>RSS源管理</h2>
+            <div class="panel-actions">
+              <button class="btn btn-primary" id="addFeedBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                添加 RSS 源
+              </button>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-content" id="feedsList">
+              <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 11a9 9 0 0 1 9 9"></path>
+                  <path d="M4 4a16 16 0 0 1 16 16"></path>
+                  <circle cx="5" cy="19" r="1"></circle>
+                </svg>
+                <p>暂无 RSS 源</p>
+                <span>点击「添加 RSS 源」开始配置</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 检查历史 -->
+        <section class="tab-panel" id="tabHistory">
+          <div class="panel-header">
+            <h2>检查历史</h2>
+            <div class="panel-actions">
+              <button class="btn btn-secondary" id="clearHistoryBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                清空历史
+              </button>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-content" id="historyList">
+              <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <p>暂无检查记录</p>
+                <span>开始监控后将记录检查历史</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 设置 -->
+        <section class="tab-panel" id="tabSettings">
+          <div class="panel-header">
+            <h2>设置</h2>
+          </div>
+          
+          <div class="settings-grid">
+            <!-- 常规设置 -->
+            <div class="card settings-card">
+              <h3 class="settings-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                常规设置
+              </h3>
+              
+              <div class="setting-item">
+                <label class="setting-label">检查间隔</label>
+                <div class="setting-control">
+                  <select class="select" id="checkIntervalSelect">
+                    <option value="1">1 分钟</option>
+                    <option value="5" selected>5 分钟</option>
+                    <option value="10">10 分钟</option>
+                    <option value="15">15 分钟</option>
+                    <option value="30">30 分钟</option>
+                    <option value="60">1 小时</option>
+                  </select>
+                </div>
+                <p class="setting-hint">每隔多少分钟自动检查一次 RSS 源</p>
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">主题模式</label>
+                <div class="setting-control">
+                  <div class="theme-options" id="themeOptions">
+                    <label class="theme-option" data-theme="system">
+                      <input type="radio" name="theme" value="system">
+                      <div class="theme-option-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                          <path d="M8 21h8"></path>
+                          <path d="M12 17v4"></path>
+                        </svg>
+                        <span>跟随系统</span>
+                      </div>
+                    </label>
+                    <label class="theme-option" data-theme="light">
+                      <input type="radio" name="theme" value="light">
+                      <div class="theme-option-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="5"></circle>
+                          <line x1="12" y1="1" x2="12" y2="3"></line>
+                          <line x1="12" y1="21" x2="12" y2="23"></line>
+                          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                          <line x1="1" y1="12" x2="3" y2="12"></line>
+                          <line x1="21" y1="12" x2="23" y2="12"></line>
+                          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <span>浅色模式</span>
+                      </div>
+                    </label>
+                    <label class="theme-option" data-theme="dark">
+                      <input type="radio" name="theme" value="dark">
+                      <div class="theme-option-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span>深色模式</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">开机自启</label>
+                <div class="setting-control">
+                  <label class="toggle">
+                    <input type="checkbox" id="autoStartCheckbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <p class="setting-hint">随系统启动自动运行并最小化到托盘</p>
+              </div>
+            </div>
+            
+            <!-- 邮件设置 -->
+            <div class="card settings-card">
+              <h3 class="settings-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                邮件通知设置
+              </h3>
+              
+              <div class="setting-item">
+                <label class="setting-label">SMTP 服务器</label>
+                <input type="text" class="input" id="smtpHost" placeholder="smtp.example.com">
+              </div>
+              
+              <div class="setting-row">
+                <div class="setting-item">
+                  <label class="setting-label">端口</label>
+                  <input type="number" class="input" id="smtpPort" placeholder="465" min="1" max="65535">
+                </div>
+                <div class="setting-item">
+                  <label class="setting-label">加密方式</label>
+                  <select class="select" id="smtpSecure">
+                    <option value="true">SSL/TLS (465)</option>
+                    <option value="false">STARTTLS (587)</option>
+                    <option value="false">无加密 (25)</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">用户名/邮箱</label>
+                <input type="text" class="input" id="smtpUser" placeholder="your@email.com">
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">授权码/密码</label>
+                <div class="input-with-toggle">
+                  <input type="password" class="input" id="smtpPass" placeholder="授权码或密码">
+                  <button class="icon-btn" id="togglePasswordBtn" aria-label="显示/隐藏密码">
+                    <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">发件人</label>
+                <input type="text" class="input" id="smtpFrom" placeholder="RSS Monitor <noreply@example.com>">
+              </div>
+              
+              <div class="setting-item">
+                <label class="setting-label">收件人</label>
+                <input type="text" class="input" id="smtpTo" placeholder="recipient@example.com (多个用逗号分隔)">
+              </div>
+              
+              <div class="setting-actions">
+                <button class="btn btn-secondary" id="testEmailBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  发送测试邮件
+                </button>
+                <button class="btn btn-primary" id="saveEmailBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  保存邮件配置
+                </button>
+              </div>
+            </div>
+            
+            <!-- 数据管理 -->
+            <div class="card settings-card">
+              <h3 class="settings-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                数据管理
+              </h3>
+              
+              <div class="setting-actions">
+                <button class="btn btn-secondary" id="exportConfigBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  导出配置
+                </button>
+                <button class="btn btn-secondary" id="importConfigBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  导入配置
+                </button>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;">
+              </div>
+              
+              <div class="setting-divider"></div>
+              
+              <div class="setting-actions danger-zone">
+                <button class="btn btn-danger" id="clearNotifiedBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  清空通知记录
+                </button>
+                <span class="danger-hint">清空后已通知的视频将重新发送通知</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- 添加/编辑 RSS 源模态框 -->
+  <div class="modal-overlay" id="feedModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="feedModalTitle">添加 RSS 源</h3>
+        <button class="icon-btn modal-close" id="feedModalClose" aria-label="关闭">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <form class="modal-body" id="feedForm">
+        <input type="hidden" id="feedId">
+        
+        <div class="form-group">
+          <label for="feedName">名称 <span class="required">*</span></label>
+          <input type="text" class="input" id="feedName" placeholder="例如: Bilibili 动画区" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedUrl">RSS 链接 <span class="required">*</span></label>
+          <input type="url" class="input" id="feedUrl" placeholder="https://example.com/rss.xml" required>
+          <button type="button" class="btn btn-ghost btn-sm" id="testFeedBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            测试连接
+          </button>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="feedEnabled" checked>
+            <span class="checkbox-custom"></span>
+            <span>启用此源</span>
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedKeywords">包含关键词 (可选，多个用逗号分隔)</label>
+          <input type="text" class="input" id="feedKeywords" placeholder="例如: 动画, 新番, 4K">
+          <p class="form-hint">只有标题或内容包含这些关键词的视频才会通知</p>
+        </div>
+        
+        <div class="form-group">
+          <label for="feedExcludeKeywords">排除关键词 (可选，多个用逗号分隔)</label>
+          <input type="text" class="input" id="feedExcludeKeywords" placeholder="例如: 广告, 合集, 预告">
+          <p class="form-hint">包含这些关键词的视频将不会通知</p>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="feedModalCancel">取消</button>
+          <button type="submit" class="btn btn-primary" id="feedModalSubmit">
+            <span id="feedModalSubmitText">添加</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 视频详情模态框 -->
+  <div class="modal-overlay" id="videoModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="videoModalTitle">视频详情</h3>
+        <button class="icon-btn modal-close" id="videoModalClose" aria-label="关闭">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="videoModalBody">
+        <!-- 动态填充 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 提示 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 加载遮罩 -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p id="loadingText">加载中...</p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

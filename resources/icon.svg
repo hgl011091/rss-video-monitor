@@ -1,0 +1,47 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景圆角矩形 -->
+  <rect x="24" y="24" width="208" height="208" rx="32" fill="url(#gradientBg)"/>
+  
+  <!-- 电视/显示器形状 -->
+  <rect x="64" y="56" width="128" height="96" rx="8" fill="url(#screenGradient)"/>
+  <rect x="72" y="64" width="112" height="72" rx="4" fill="#0f172a"/>
+  
+  <!-- 播放按钮 -->
+  <polygon points="104,88 104,136 144,112" fill="url(#playGradient)"/>
+  
+  <!-- RSS 信号波 -->
+  <path d="M184 120a40 40 0 0 1 0 40" stroke="url(#waveGradient)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M196 120a28 28 0 0 1 0 28" stroke="url(#waveGradient)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.4"/>
+  <circle cx="208" cy="140" r="4" fill="url(#waveGradient)"/>
+  
+  <!-- 底部装饰条 -->
+  <rect x="80" y="176" width="96" height="6" rx="3" fill="url(#accentGradient)"/>
+  
+  <defs>
+    <linearGradient id="gradientBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    
+    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    
+    <linearGradient id="playGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+  </defs>
+</svg>
