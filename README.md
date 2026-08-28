@@ -120,6 +120,9 @@ rss-video-monitor/
 | 网络请求 | axios |
 | 打包分发 | electron-builder（portable / zip） |
 
+## 🔗 相关项目
+
+- **[dsh-rss-monitor](https://github.com/<你的用户名>/dsh-rss-monitor)** —— 同一套监控 / 去重 / 邮件通知逻辑的 **DeepSeek Harness 原生插件版**：无需独立运行，直接集成进 Harness 设置页，SMTP 密码走 Harness 凭据库。
 ## 📄 License
 
 [MIT](LICENSE)
